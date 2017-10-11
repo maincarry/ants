@@ -501,7 +501,8 @@ class QueenAnt(ScubaThrower):  # You should change this line
         if not self.trueness:
           self.reduce_armor(self.armor)
         else:
-          ants_to_buff = self.find_ants(self.place) 
+          super().action(colony)
+          ants_to_buff = self.find_ants(self.place)
           for ant in ants_to_buff:
             buff_ants.append(ant)
             ant.damage *= 2
