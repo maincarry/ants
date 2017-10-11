@@ -70,6 +70,7 @@ class Place(object):
         """
         if insect.is_ant:
             # Phase 6: Special Handling for BodyguardAnt and QueenAnt
+            if isinstance(insect, QueenAnt) and insect.trueness: return
             if self.ant is insect:
                 if hasattr(self.ant, 'container') and self.ant.container:
                     self.ant = self.ant.ant
@@ -456,19 +457,26 @@ class TankAnt(BodyguardAnt):
 
 
 # BEGIN Problem 13
-class QueenAnt(Ant):  # You should change this line
+class QueenAnt(ScubaThrower):  # You should change this line
     # END Problem 13
     """The Queen of the colony. The game is over if a bee enters her place."""
 
     name = 'Queen'
     # BEGIN Problem 13
-    implemented = False  # Change to True to view in the GUI
-
+    implemented = True  # Change to True to view in the GUI
+    food_cost = 7
+    queen_true = False
     # END Problem 13
 
     def __init__(self):
         # BEGIN Problem 13
-        "*** YOUR CODE HERE ***"
+        if QueenAnt.queen_true:
+          self.trueness = False
+        else:
+          QueenAnt.queen_true = True
+          self.trueness = True
+        super().__init__()
+        self.buff_ants = []
         # END Problem 13
 
     def action(self, colony):
@@ -478,7 +486,25 @@ class QueenAnt(Ant):  # You should change this line
         Impostor queens do only one thing: reduce their own armor to 0.
         """
         # BEGIN Problem 13
-        "*** YOUR CODE HERE ***"
+        def find_ants(place):
+          if place.exit == None:
+            if place.ant and place.ant not in self.buff_ants:
+              return [place.ant]
+            else:
+              return []
+          else:
+            if place.ant and place.ant not in self.buff_ants:
+              return [place.ant] + find_ants(place.exit)
+            else:
+              return [] + find_ants(place.exit)
+
+        if not self.trueness:
+          self.reduce_armor(self.armor)
+        else:
+          ants_to_buff = self.find_ants(self.place) 
+          for ant in ants_to_buff:
+            buff_ants.append(ant)
+            ant.damage *= 2
         # END Problem 13
 
     def reduce_armor(self, amount):
@@ -486,7 +512,11 @@ class QueenAnt(Ant):  # You should change this line
         remaining, signal the end of the game.
         """
         # BEGIN Problem 13
-        "*** YOUR CODE HERE ***"
+        if self.armor <= amount:
+          super().reduce_armor(amount)
+          bees_win()
+        else:
+          super().reduce_armor(amount)
         # END Problem 13
 
 
