@@ -386,6 +386,8 @@ class HungryAnt(Ant):
     food_cost = 4
     time_to_digest = 3
 
+    time_to_digest = 3
+
     # END Problem 10
 
     def __init__(self):
@@ -404,8 +406,11 @@ class HungryAnt(Ant):
         # BEGIN Problem 10
         if self.digesting > 0:
             self.digesting -= 1
-        elif self.digesting == 0 and self.place.bees:
-                self.eat_bee(random_or_none(self.place.bees))
+
+        else:
+            if self.place.bees:
+                target = random_or_none(self.place.bees)
+                self.eat_bee(target)
                 # END Problem 10
 
 
@@ -414,8 +419,10 @@ class BodyguardAnt(Ant):
     name = 'Bodyguard'
     # BEGIN Problem 11
     implemented = False  # Change to True to view in the GUI
+
     container = True
     food_cost = 4
+
     # END Problem 11
 
     def __init__(self):
@@ -424,13 +431,15 @@ class BodyguardAnt(Ant):
 
     def contain_ant(self, ant):
         # BEGIN Problem 11
-        self.ant = ant
+        "*** YOUR CODE HERE ***"
         # END Problem 11
 
     def action(self, colony):
         # BEGIN Problem 11
+
         if self.ant:
           self.ant.action(colony)
+
         # END Problem 11
 
 
