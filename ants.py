@@ -328,6 +328,12 @@ class NinjaAnt(Ant):
 
 
 # BEGIN Problem 9
+class ScubaThrower(ThrowerAnt):
+  name = "Scuba"
+  watersafe = True
+  food_cost = 6
+  implemented = True
+
 # The ScubaThrower class
 # END Problem 9
 
@@ -338,22 +344,29 @@ class HungryAnt(Ant):
     """
     name = 'Hungry'
     # BEGIN Problem 10
-    implemented = False   # Change to True to view in the GUI
+    implemented = True   # Change to True to view in the GUI
+    time_to_digest = 3
+    food_cost = 4
     # END Problem 10
 
     def __init__(self):
         # BEGIN Problem 10
-        "*** YOUR CODE HERE ***"
+        super().__init__()
+        self.digesting = 0
         # END Problem 10
 
     def eat_bee(self, bee):
         # BEGIN Problem 10
-        "*** YOUR CODE HERE ***"
+        bee.reduce_armor(bee.armor)
         # END Problem 10
 
     def action(self, colony):
         # BEGIN Problem 10
-        "*** YOUR CODE HERE ***"
+        if self.digesting > 0:
+          self.digesting -= 1
+        elif self.digesting == 0 and self.place.bees is not None:
+          self.eat_bee(random_or_none(self.place.bees))
+          self.digesting = self.time_to_digest
         # END Problem 10
 
 
