@@ -24,7 +24,8 @@ class Place(object):
         self.entrance = None  # A Place
         # Phase 1: Add an entrance to the exit
         # BEGIN Problem 2
-        "*** YOUR CODE HERE ***"
+        if self.exit != None:
+          exit.entrance = self
         # END Problem 2
 
     def add_insect(self, insect):
@@ -84,6 +85,7 @@ class Insect(object):
 
     is_ant = False
     damage = 0
+    watersafe = False
 
     def __init__(self, armor, place=None):
         """Create an Insect with an ARMOR amount and a starting PLACE."""
@@ -119,6 +121,7 @@ class Bee(Insect):
 
     name = 'Bee'
     damage = 1
+    watersafe = True
 
     def sting(self, ant):
         """Attack an ANT, reducing its armor by 1."""
@@ -170,14 +173,14 @@ class HarvesterAnt(Ant):
 
     name = 'Harvester'
     implemented = True
-
+    food_cost = 2
     def action(self, colony):
         """Produce 1 additional food for the COLONY.
 
         colony -- The AntColony, used to access game state information.
         """
         # BEGIN Problem 1
-        "*** YOUR CODE HERE ***"
+        colony.food += 1
         # END Problem 1
 
 
@@ -187,6 +190,7 @@ class ThrowerAnt(Ant):
     name = 'Thrower'
     implemented = True
     damage = 1
+    food_cost = 3
 
     def nearest_bee(self, hive):
         """Return the nearest Bee in a Place that is not the HIVE, connected to
@@ -195,7 +199,19 @@ class ThrowerAnt(Ant):
         This method returns None if there is no such Bee (or none in range).
         """
         # BEGIN Problem 5
-        return random_or_none(self.place.bees)
+        def nearest_place(place):
+          if isinstance(place, Hive):
+            return None
+          if place.bees != []:
+            return random_or_none(place.bees)
+          else:
+            return nearest_place(place.entrance)
+        return nearest_place(self.place)
+        # place = self.place
+        # while not isinstance(place, Hive):
+        #   if place.bees != []:
+        #     return random_or_none(place.bees)
+        #   place = place.entrance
         # END Problem 5
 
     def throw_at(self, target):
@@ -223,7 +239,9 @@ class Water(Place):
     def add_insect(self, insect):
         """Add INSECT if it is watersafe, otherwise reduce its armor to 0."""
         # BEGIN Problem 3
-        "*** YOUR CODE HERE ***"
+        super().add_insect(insect)
+        if insect.watersafe == False:
+          insect.reduce_armor(insect.armor)
         # END Problem 3
 
 
@@ -233,8 +251,9 @@ class FireAnt(Ant):
     name = 'Fire'
     damage = 3
     # BEGIN Problem 4
-    implemented = False   # Change to True to view in the GUI
+    implemented = True   # Change to True to view in the GUI
     # END Problem 4
+    food_cost = 5
 
     def reduce_armor(self, amount):
         """Reduce armor by AMOUNT, and remove the FireAnt from its place if it
@@ -242,7 +261,11 @@ class FireAnt(Ant):
         the current place.
         """
         # BEGIN Problem 4
-        "*** YOUR CODE HERE ***"
+        original_place = self.place
+        super().reduce_armor(amount)
+        if self.armor <= 0:
+          for bee in list(original_place.bees):
+            bee.reduce_armor(self.damage)
         # END Problem 4
 
 
