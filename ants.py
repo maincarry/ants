@@ -409,7 +409,6 @@ class BodyguardAnt(Ant):
     name = 'Bodyguard'
     # BEGIN Problem 11
     implemented = False  # Change to True to view in the GUI
-
     # END Problem 11
 
     def __init__(self):
