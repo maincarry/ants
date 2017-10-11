@@ -41,7 +41,7 @@ class Place(object):
         if insect.is_ant:
             if self.ant is None:
                 self.ant = insect
-            elif type(self.ant) == BodyguardAnt and self.ant.ant != None:
+            elif self.ant.container and self.ant.ant != None:
                 raise AssertionError
             else:
                 # Phase 6: Special handling for BodyguardAnt
@@ -386,8 +386,6 @@ class HungryAnt(Ant):
     food_cost = 4
     time_to_digest = 3
 
-    time_to_digest = 3
-
     # END Problem 10
 
     def __init__(self):
@@ -406,11 +404,8 @@ class HungryAnt(Ant):
         # BEGIN Problem 10
         if self.digesting > 0:
             self.digesting -= 1
-
-        else:
-            if self.place.bees:
-                target = random_or_none(self.place.bees)
-                self.eat_bee(target)
+        elif self.digesting == 0 and self.place.bees:
+                self.eat_bee(random_or_none(self.place.bees))
                 # END Problem 10
 
 
@@ -419,10 +414,8 @@ class BodyguardAnt(Ant):
     name = 'Bodyguard'
     # BEGIN Problem 11
     implemented = False  # Change to True to view in the GUI
-
     container = True
     food_cost = 4
-
     # END Problem 11
 
     def __init__(self):
@@ -431,15 +424,13 @@ class BodyguardAnt(Ant):
 
     def contain_ant(self, ant):
         # BEGIN Problem 11
-        "*** YOUR CODE HERE ***"
+        self.ant = ant
         # END Problem 11
 
     def action(self, colony):
         # BEGIN Problem 11
-
         if self.ant:
           self.ant.action(colony)
-
         # END Problem 11
 
 
@@ -448,13 +439,17 @@ class TankAnt(BodyguardAnt):
     name = 'Tank'
     damage = 1
     # BEGIN Problem 12
-    implemented = False  # Change to True to view in the GUI
+    implemented = True  # Change to True to view in the GUI
+    food_cost = 6
 
     # END Problem 12
 
     def action(self, colony):
         # BEGIN Problem 12
-        "*** YOUR CODE HERE ***"
+        if self.ant:
+          self.ant.action(colony)
+        for bee in list(self.place.bees):
+          bee.reduce_armor(self.damage)
         # END Problem 12
 
 
