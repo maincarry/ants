@@ -489,17 +489,11 @@ class QueenAnt(ScubaThrower):  # You should change this line
         def find_ants(place):
           if place.exit == None:
             if place.ant and place.ant not in self.buff_ants:
-              if place.ant.container and place.ant.ant != None:
                 return [place.ant.ant]
-              else:
-                return [place.ant]
             else:
               return []
           else:
             if place.ant and place.ant not in self.buff_ants:
-              if place.ant.container and place.ant.ant != None:
-                return [place.ant.ant] + find_ants(place.exit)
-              else:
                 return [place.ant] + find_ants(place.exit)
             else:
               return [] + find_ants(place.exit)
@@ -510,6 +504,8 @@ class QueenAnt(ScubaThrower):  # You should change this line
           super().action(colony)
           ants_to_buff = find_ants(self.place.exit)
           for ant in ants_to_buff:
+            if ant.container:
+              ant.ant.damage *= 2
             self.buff_ants.append(ant)
             ant.damage *= 2
         # END Problem 13
