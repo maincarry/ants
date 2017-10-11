@@ -44,7 +44,14 @@ class Place(object):
             else:
                 # Phase 6: Special handling for BodyguardAnt
                 # BEGIN Problem 11
-                assert self.ant is None, 'Two ants in {0}'.format(self)
+                assert self.ant.container or insect.container, 'Two ants in {0}'.format(self)
+                if self.ant.can_contain(insect):
+                  self.ant.contain_ant(insect)
+                  insect.place = self
+                elif insect.can_contain(self.ant):
+                  insect.contain_ant(self.ant)
+                  insect.place = self
+                  self.ant = insect
                 # END Problem 11
         else:
             self.bees.append(insect)
@@ -160,6 +167,7 @@ class Ant(Insect):
     implemented = False  # Only implemented Ant classes should be instantiated
     food_cost = 0
     blocks_path = True
+    container = False
 
     def __init__(self, armor=1):
         """Create an Ant with an ARMOR quantity."""
@@ -167,8 +175,7 @@ class Ant(Insect):
 
     def can_contain(self, other):
         # BEGIN Problem 11
-        "*** YOUR CODE HERE ***"
-        # END Problem 11
+        return self.container and self.ant is None and other.container == False
 
 
 class HarvesterAnt(Ant):
@@ -343,7 +350,8 @@ class ScubaThrower(ThrowerAnt):
     watersafe = True
     food_cost = 6
     implemented = True
-
+    def reduce_armor(self):
+      super().reduce_armor(0)
 
 # The ScubaThrower class
 # END Problem 9
@@ -370,15 +378,15 @@ class HungryAnt(Ant):
     def eat_bee(self, bee):
         # BEGIN Problem 10
         bee.reduce_armor(bee.armor)
+        self.digesting = self.time_to_digest
         # END Problem 10
 
     def action(self, colony):
         # BEGIN Problem 10
         if self.digesting > 0:
             self.digesting -= 1
-        elif self.digesting == 0 and self.place.bees is not None:
+        elif self.digesting == 0 and self.place.bees:
             self.eat_bee(random_or_none(self.place.bees))
-            self.digesting = self.time_to_digest
             # END Problem 10
 
 
@@ -388,6 +396,7 @@ class BodyguardAnt(Ant):
     # BEGIN Problem 11
     implemented = True  # Change to True to view in the GUI
     food_cost = 4
+    container = True
     # END Problem 11
 
     def __init__(self):
@@ -411,13 +420,13 @@ class TankAnt(BodyguardAnt):
     damage = 1
     # BEGIN Problem 12
     implemented = False  # Change to True to view in the GUI
-
     # END Problem 12
 
     def action(self, colony):
         # BEGIN Problem 12
         "*** YOUR CODE HERE ***"
         # END Problem 12
+
 
 
 # BEGIN Problem 13
@@ -945,3 +954,5 @@ def run(*args):
     Insect.reduce_armor = class_method_wrapper(Insect.reduce_armor,
                                                pre=print_expired_insects)
     start_with_strategy(args, interactive_strategy)
+
+
