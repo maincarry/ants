@@ -489,12 +489,18 @@ class QueenAnt(ScubaThrower):  # You should change this line
         def find_ants(place):
           if place.exit == None:
             if place.ant and place.ant not in self.buff_ants:
-              return [place.ant]
+              if place.ant.container and place.ant.ant != None:
+                return [place.ant.ant]
+              else:
+                return [place.ant]
             else:
               return []
           else:
             if place.ant and place.ant not in self.buff_ants:
-              return [place.ant] + find_ants(place.exit)
+              if place.ant.container and place.ant.ant != None:
+                return [place.ant.ant] + find_ants(place.exit)
+              else:
+                return [place.ant] + find_ants(place.exit)
             else:
               return [] + find_ants(place.exit)
 
@@ -502,9 +508,9 @@ class QueenAnt(ScubaThrower):  # You should change this line
           self.reduce_armor(self.armor)
         else:
           super().action(colony)
-          ants_to_buff = self.find_ants(self.place)
+          ants_to_buff = find_ants(self.place.exit)
           for ant in ants_to_buff:
-            buff_ants.append(ant)
+            self.buff_ants.append(ant)
             ant.damage *= 2
         # END Problem 13
 
@@ -513,7 +519,7 @@ class QueenAnt(ScubaThrower):  # You should change this line
         remaining, signal the end of the game.
         """
         # BEGIN Problem 13
-        if self.armor <= amount:
+        if self.armor <= amount and self.trueness:
           super().reduce_armor(amount)
           bees_win()
         else:
