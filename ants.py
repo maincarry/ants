@@ -139,8 +139,6 @@ class Bee(Insect):
         # Phase 4: Special handling for NinjaAnt
         # BEGIN Problem 8
         return self.place.ant is not None and self.place.ant.blocks_path
-
-
         # END Problem 8
 
     def action(self, colony):
@@ -333,8 +331,8 @@ class NinjaAnt(Ant):
 
     def action(self, colony):
         # BEGIN Problem 8
-
-        for bee in list(self.place.bees):
+        original_place = self.place
+        for bee in list(original_place.bees):
             bee.reduce_armor(self.damage)
             # END Problem 8
 
@@ -388,8 +386,8 @@ class BodyguardAnt(Ant):
     """BodyguardAnt provides protection to other Ants."""
     name = 'Bodyguard'
     # BEGIN Problem 11
-    implemented = False  # Change to True to view in the GUI
-
+    implemented = True  # Change to True to view in the GUI
+    food_cost = 4
     # END Problem 11
 
     def __init__(self):
@@ -398,12 +396,12 @@ class BodyguardAnt(Ant):
 
     def contain_ant(self, ant):
         # BEGIN Problem 11
-        "*** YOUR CODE HERE ***"
+        self.ant = ant
         # END Problem 11
 
     def action(self, colony):
         # BEGIN Problem 11
-        "*** YOUR CODE HERE ***"
+
         # END Problem 11
 
 
