@@ -46,8 +46,8 @@ class Place(object):
             else:
                 # Phase 6: Special handling for BodyguardAnt
                 # BEGIN Problem 11
-                assert self.ant.container or insect.container, 'Two ants in {0}'.format(
-                    self)
+                assert self.ant.container or insect.container, \
+                    'Two ants in {0}'.format(self)
                 if self.ant.can_contain(insect):
                     self.ant.contain_ant(insect)
                 elif insect.can_contain(self.ant):
@@ -77,8 +77,8 @@ class Place(object):
                 else:
                     self.ant = None
             else:
-                if hasattr(self.ant,
-                           'container') and self.ant.container and self.ant.ant is insect:
+                if hasattr(self.ant, 'container') and \
+                        self.ant.container and self.ant.ant is insect:
                     self.ant.ant = None
                 else:
                     assert False, '{0} is not in {1}'.format(insect, self)
@@ -222,7 +222,8 @@ class ThrowerAnt(Ant):
         def nearest_place(place, range):
             if isinstance(place, Hive):
                 return None
-            if place.bees != [] and range <= self.max_range and range >= self.min_range:
+            if place.bees != [] and range <= self.max_range \
+                    and range >= self.min_range:
                 return random_or_none(place.bees)
             else:
                 return nearest_place(place.entrance, range + 1)
@@ -478,7 +479,8 @@ class QueenAnt(ScubaThrower):  # You should change this line
             self.trueness = True
         super().__init__()
         self.buff_ants = []
-        # END Problem 13
+
+    # END Problem 13
 
     def action(self, colony):
         """A queen ant throws a leaf, but also doubles the damage of ants
