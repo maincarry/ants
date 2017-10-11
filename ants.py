@@ -41,16 +41,16 @@ class Place(object):
         if insect.is_ant:
             if self.ant is None:
                 self.ant = insect
+            elif type(self.ant) == BodyguardAnt and self.ant.ant != None:
+                raise AssertionError
             else:
                 # Phase 6: Special handling for BodyguardAnt
                 # BEGIN Problem 11
                 assert self.ant.container or insect.container, 'Two ants in {0}'.format(self)
                 if self.ant.can_contain(insect):
                   self.ant.contain_ant(insect)
-                  insect.place = self
                 elif insect.can_contain(self.ant):
                   insect.contain_ant(self.ant)
-                  insect.place = self
                   self.ant = insect
                 # END Problem 11
         else:
@@ -146,6 +146,8 @@ class Bee(Insect):
         # Phase 4: Special handling for NinjaAnt
         # BEGIN Problem 8
         return self.place.ant is not None and self.place.ant.blocks_path
+
+
         # END Problem 8
 
     def action(self, colony):
@@ -175,7 +177,8 @@ class Ant(Insect):
 
     def can_contain(self, other):
         # BEGIN Problem 11
-        return self.container and self.ant is None and other.container == False
+        return self.container and self.ant == None and other.container == False
+        # END Problem 11
 
 
 class HarvesterAnt(Ant):
@@ -223,11 +226,13 @@ class ThrowerAnt(Ant):
                 return nearest_place(place.entrance, range + 1)
 
         return nearest_place(self.place, 0)
+
         # place = self.place
         # while not isinstance(place, Hive):
         #   if place.bees != []:
         #     return random_or_none(place.bees)
         #   place = place.entrance
+
         # END Problem 5
 
     def throw_at(self, target):
@@ -278,11 +283,16 @@ class FireAnt(Ant):
         the current place.
         """
         # BEGIN Problem 4
-        original_place = self.place
+
+        bee_lists = self.place.bees[:]
         super().reduce_armor(amount)
+
+        # apply explosion damage
         if self.armor <= 0:
-            for bee in list(original_place.bees):
+            for bee in bee_lists:
                 bee.reduce_armor(self.damage)
+
+
                 # END Problem 4
 
 
@@ -338,22 +348,31 @@ class NinjaAnt(Ant):
 
     def action(self, colony):
         # BEGIN Problem 8
-        original_place = self.place
-        for bee in list(original_place.bees):
+
+        # list() used for creating copies
+        for bee in list(self.place.bees):
             bee.reduce_armor(self.damage)
+
             # END Problem 8
 
 
+# The ScubaThrower class
 # BEGIN Problem 9
 class ScubaThrower(ThrowerAnt):
     name = "Scuba"
     watersafe = True
     food_cost = 6
-    implemented = True
-    def reduce_armor(self):
-      super().reduce_armor(0)
 
-# The ScubaThrower class
+    implemented = True
+
+    # def reduce_armor(self, amount):
+    #     if self.place is Water:
+    #         # can't lose armor in water
+    #         return
+    #     else:
+    #         super().reduce_armor(amount)
+
+
 # END Problem 9
 
 
@@ -364,8 +383,8 @@ class HungryAnt(Ant):
     name = 'Hungry'
     # BEGIN Problem 10
     implemented = True  # Change to True to view in the GUI
-    time_to_digest = 3
     food_cost = 4
+    time_to_digest = 3
 
     # END Problem 10
 
@@ -386,17 +405,17 @@ class HungryAnt(Ant):
         if self.digesting > 0:
             self.digesting -= 1
         elif self.digesting == 0 and self.place.bees:
-            self.eat_bee(random_or_none(self.place.bees))
-            # END Problem 10
+                self.eat_bee(random_or_none(self.place.bees))
+                # END Problem 10
 
 
 class BodyguardAnt(Ant):
     """BodyguardAnt provides protection to other Ants."""
     name = 'Bodyguard'
     # BEGIN Problem 11
-    implemented = True  # Change to True to view in the GUI
-    food_cost = 4
+    implemented = False  # Change to True to view in the GUI
     container = True
+    food_cost = 4
     # END Problem 11
 
     def __init__(self):
@@ -410,7 +429,8 @@ class BodyguardAnt(Ant):
 
     def action(self, colony):
         # BEGIN Problem 11
-
+        if self.ant:
+          self.ant.action(colony)
         # END Problem 11
 
 
@@ -420,13 +440,13 @@ class TankAnt(BodyguardAnt):
     damage = 1
     # BEGIN Problem 12
     implemented = False  # Change to True to view in the GUI
+
     # END Problem 12
 
     def action(self, colony):
         # BEGIN Problem 12
         "*** YOUR CODE HERE ***"
         # END Problem 12
-
 
 
 # BEGIN Problem 13
@@ -954,5 +974,3 @@ def run(*args):
     Insect.reduce_armor = class_method_wrapper(Insect.reduce_armor,
                                                pre=print_expired_insects)
     start_with_strategy(args, interactive_strategy)
-
-
