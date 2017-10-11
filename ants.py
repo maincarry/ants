@@ -41,10 +41,17 @@ class Place(object):
         if insect.is_ant:
             if self.ant is None:
                 self.ant = insect
+            elif type(self.ant) == BodyguardAnt and self.ant.ant != None:
+                raise AssertionError
             else:
                 # Phase 6: Special handling for BodyguardAnt
                 # BEGIN Problem 11
-                assert self.ant is None, 'Two ants in {0}'.format(self)
+                assert self.ant.container or insect.container, 'Two ants in {0}'.format(self)
+                if self.ant.can_contain(insect):
+                  self.ant.contain_ant(insect)
+                elif insect.can_contain(self.ant):
+                  insect.contain_ant(self.ant)
+                  self.ant = insect
                 # END Problem 11
         else:
             self.bees.append(insect)
@@ -162,6 +169,7 @@ class Ant(Insect):
     implemented = False  # Only implemented Ant classes should be instantiated
     food_cost = 0
     blocks_path = True
+    container = False
 
     def __init__(self, armor=1):
         """Create an Ant with an ARMOR quantity."""
@@ -169,7 +177,7 @@ class Ant(Insect):
 
     def can_contain(self, other):
         # BEGIN Problem 11
-        "*** YOUR CODE HERE ***"
+        return self.container and self.ant == None and other.container == False
         # END Problem 11
 
 
@@ -376,6 +384,7 @@ class HungryAnt(Ant):
     # BEGIN Problem 10
     implemented = True  # Change to True to view in the GUI
     food_cost = 4
+    time_to_digest = 3
 
     time_to_digest = 3
 
@@ -397,6 +406,7 @@ class HungryAnt(Ant):
         # BEGIN Problem 10
         if self.digesting > 0:
             self.digesting -= 1
+
         else:
             if self.place.bees:
                 target = random_or_none(self.place.bees)
@@ -409,6 +419,10 @@ class BodyguardAnt(Ant):
     name = 'Bodyguard'
     # BEGIN Problem 11
     implemented = False  # Change to True to view in the GUI
+
+    container = True
+    food_cost = 4
+
     # END Problem 11
 
     def __init__(self):
@@ -422,7 +436,10 @@ class BodyguardAnt(Ant):
 
     def action(self, colony):
         # BEGIN Problem 11
-        "*** YOUR CODE HERE ***"
+
+        if self.ant:
+          self.ant.action(colony)
+
         # END Problem 11
 
 
