@@ -218,11 +218,13 @@ class ThrowerAnt(Ant):
                 return nearest_place(place.entrance, range + 1)
 
         return nearest_place(self.place, 0)
+
         # place = self.place
         # while not isinstance(place, Hive):
         #   if place.bees != []:
         #     return random_or_none(place.bees)
         #   place = place.entrance
+
         # END Problem 5
 
     def throw_at(self, target):
@@ -273,11 +275,16 @@ class FireAnt(Ant):
         the current place.
         """
         # BEGIN Problem 4
-        original_place = self.place
+
+        bee_lists = self.place.bees[:]
         super().reduce_armor(amount)
+
+        # apply explosion damage
         if self.armor <= 0:
-            for bee in list(original_place.bees):
+            for bee in bee_lists:
                 bee.reduce_armor(self.damage)
+
+
                 # END Problem 4
 
 
@@ -334,20 +341,30 @@ class NinjaAnt(Ant):
     def action(self, colony):
         # BEGIN Problem 8
 
+        # list() used for creating copies
         for bee in list(self.place.bees):
             bee.reduce_armor(self.damage)
+
             # END Problem 8
 
 
+# The ScubaThrower class
 # BEGIN Problem 9
 class ScubaThrower(ThrowerAnt):
     name = "Scuba"
     watersafe = True
     food_cost = 6
+
     implemented = True
 
+    # def reduce_armor(self, amount):
+    #     if self.place is Water:
+    #         # can't lose armor in water
+    #         return
+    #     else:
+    #         super().reduce_armor(amount)
 
-# The ScubaThrower class
+
 # END Problem 9
 
 
@@ -358,8 +375,9 @@ class HungryAnt(Ant):
     name = 'Hungry'
     # BEGIN Problem 10
     implemented = True  # Change to True to view in the GUI
-    time_to_digest = 3
     food_cost = 4
+
+    time_to_digest = 3
 
     # END Problem 10
 
@@ -372,16 +390,18 @@ class HungryAnt(Ant):
     def eat_bee(self, bee):
         # BEGIN Problem 10
         bee.reduce_armor(bee.armor)
+        self.digesting = self.time_to_digest
         # END Problem 10
 
     def action(self, colony):
         # BEGIN Problem 10
         if self.digesting > 0:
             self.digesting -= 1
-        elif self.digesting == 0 and self.place.bees is not None:
-            self.eat_bee(random_or_none(self.place.bees))
-            self.digesting = self.time_to_digest
-            # END Problem 10
+        else:
+            if self.place.bees:
+                target = random_or_none(self.place.bees)
+                self.eat_bee(target)
+                # END Problem 10
 
 
 class BodyguardAnt(Ant):
