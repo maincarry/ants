@@ -466,15 +466,16 @@ class QueenAnt(ScubaThrower):  # You should change this line
     implemented = True  # Change to True to view in the GUI
     food_cost = 7
     queen_true = False
+
     # END Problem 13
 
     def __init__(self):
         # BEGIN Problem 13
         if QueenAnt.queen_true:
-          self.trueness = False
+            self.trueness = False
         else:
-          QueenAnt.queen_true = True
-          self.trueness = True
+            QueenAnt.queen_true = True
+            self.trueness = True
         super().__init__()
         self.buff_ants = []
         # END Problem 13
@@ -485,30 +486,44 @@ class QueenAnt(ScubaThrower):  # You should change this line
 
         Impostor queens do only one thing: reduce their own armor to 0.
         """
+
         # BEGIN Problem 13
         def find_ants(place):
-          if place.exit == None:
-            if place.ant and place.ant not in self.buff_ants:
-                return [place.ant.ant]
+            # base case
+            if place.exit == None:
+                res = []
+                if place.ant:
+                    if place.ant.container and place.ant.ant:
+                        inside = place.ant.ant
+                        if inside not in self.buff_ants:
+                            res.append(inside)
+                    if place.ant not in self.buff_ants:
+                        res.append(place.ant)
+                return res
+
+            # normal case
             else:
-              return []
-          else:
-            if place.ant and place.ant not in self.buff_ants:
-                return [place.ant] + find_ants(place.exit)
-            else:
-              return [] + find_ants(place.exit)
+                res = []
+                if place.ant:
+                    if place.ant.container and place.ant.ant:
+                        inside = place.ant.ant
+                        if inside not in self.buff_ants:
+                            res.append(inside)
+                    if place.ant not in self.buff_ants:
+                        res.append(place.ant)
+                    return res + find_ants(place.exit)
+                else:
+                    return find_ants(place.exit)
 
         if not self.trueness:
-          self.reduce_armor(self.armor)
+            self.reduce_armor(self.armor)
         else:
-          super().action(colony)
-          ants_to_buff = find_ants(self.place.exit)
-          for ant in ants_to_buff:
-            if ant.container:
-              ant.ant.damage *= 2
-            self.buff_ants.append(ant)
-            ant.damage *= 2
-        # END Problem 13
+            super().action(colony)
+            ants_to_buff = find_ants(self.place.exit)
+            for ant in ants_to_buff:
+                self.buff_ants.append(ant)
+                ant.damage *= 2
+                # END Problem 13
 
     def reduce_armor(self, amount):
         """Reduce armor by AMOUNT, and if the True QueenAnt has no armor
@@ -516,11 +531,11 @@ class QueenAnt(ScubaThrower):  # You should change this line
         """
         # BEGIN Problem 13
         if self.armor <= amount and self.trueness:
-          super().reduce_armor(amount)
-          bees_win()
+            super().reduce_armor(amount)
+            bees_win()
         else:
-          super().reduce_armor(amount)
-        # END Problem 13
+            super().reduce_armor(amount)
+            # END Problem 13
 
 
 class AntRemover(Ant):
