@@ -220,22 +220,15 @@ class ThrowerAnt(Ant):
         # BEGIN Problem 5
 
         def nearest_place(place, range):
-            if isinstance(place, Hive):
+            if place is hive:
                 return None
-            if place.bees != [] and range <= self.max_range \
+            if place.bees and range <= self.max_range \
                     and range >= self.min_range:
                 return random_or_none(place.bees)
             else:
                 return nearest_place(place.entrance, range + 1)
 
         return nearest_place(self.place, 0)
-
-        # place = self.place
-        # while not isinstance(place, Hive):
-        #   if place.bees != []:
-        #     return random_or_none(place.bees)
-        #   place = place.entrance
-
         # END Problem 5
 
     def throw_at(self, target):
